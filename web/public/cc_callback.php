@@ -18,6 +18,7 @@ if(!$cmd) {
 $cmd = strtolower($cmd);
 
 $computer = Computer::from_key(request("key"));
+if($computer) $computer->touch();
 
 if(!$computer && !($cmd == "hi" && request("new"))) {
 	error("Unknown key, register first\n");

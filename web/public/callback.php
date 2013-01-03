@@ -3,23 +3,23 @@ include "../includes.php";
 
 write_log("[callback] ". var_export($_REQUEST, true));
 
-$key = get('key');
+$key = request('key');
 $computer = Computer::from_key($key);
+
+if(request("format")) $format = 1;
 
 if(!$computer) {
 	error("Computer not found or key missing");
 }
 
-$cmd = get("cmd");
-
-if(get("format")) $format = 1;
+$cmd = request("cmd");
 
 if(!$cmd) {
 	error("Command missing");
 }
 
-$filename = get("file");
-$parent = get("parent");
+$filename = request("file");
+$parent = request("parent");
 $selection = array('computer_id' => $computer->id, 'name' => $filename);
 
 if($parent == 0) $parent = null;
@@ -44,6 +44,9 @@ if($file) {
 }
 
 switch($cmd) {
+case "last_seen":
+	output("OK", $computer->formated_last_seen());
+	break;
 case "ls":
 
 	if(!$file && $full_filename != "/") error("Unknown directory $full_filename");
@@ -51,15 +54,9 @@ case "ls":
 
 	if($res = execute_command($computer, "ls $file_text_id $full_filename") == 1) {
 		$data = array();
-		$selection = array('computer_id' => $computer->id);
-		if($file_id) {
-			$selection['parent'] = $file_id;
-		} else {
-			$selection['parent:null'] = null;
-		}
 		$data_str = "";
-		foreach(Node::selection($selection) as $node) {
-			$node_data = array('id' => $node->id, 'name'=>$node->name, 'is_dir'=>$node->type == "dir");
+		foreach($computer->nodes($file_id) as $node) {
+			$node_data = array('id' => $node->id, 'name'=>$node->name, 'is_dir'=>$node->is_dir() ? 1 : 0);
 			$data[] = $node_data;
 			if(!$format) {
 				$data_str .= "{$node->id} " . ($node_data['is_dir'] ? "1" : "0" ) . " {$node->name}\n";

@@ -15,4 +15,8 @@ class Node extends BasicObject {
 			return "/" . $this->name;
 		}
 	}
+
+	public function is_dir() {
+		return $this->type == "dir";
+	}
 }

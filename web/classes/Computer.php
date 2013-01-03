@@ -26,4 +26,36 @@ class Computer extends BasicObject {
 		$this->key = $key;
 		return true;
 	}
+
+	public function touch() {
+		$this->last_seen = date('Y-m-d H:i:s');
+		$this->commit();
+	}
+
+	public function last_seen_date() {
+		return new DateTime($this->last_seen);
+	}
+
+	public function formated_last_seen() {
+		$diff = date_diff(new DateTime('now'), $this->last_seen_date(), true);
+		if($diff->days >= 1) {
+			return $this->last_seen;
+		} else {
+			if($diff->h == 1) return "1 hour ago";
+			if($diff->h > 1) return $diff->h . " hours ago";
+			if($diff->i == 1) return "1 minute ago";
+			if($diff->i > 1) return $diff->i . " minutes ago";
+			return $diff->s . " seconds ago";
+		}
+	}
+
+	public function nodes($parent = null) {
+		$selection = array('computer_id' => $this->id, '@order'=>array('type', 'name'));
+		if($parent == null) {
+			$selection['parent:null'] = null;
+		} else {
+			$selection['parent'] = $parent;
+		}
+		return Node::selection($selection);
+	}
 }
