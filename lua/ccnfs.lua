@@ -46,8 +46,7 @@ end
 function call_raw(data)
 	local res = http.post(url,data);
 	if(not res) then
-		print("Critical error: http.post returned nil, I'm out of here");
-		shell.exit();
+		error("Critical error: http.post returned nil, I'm out of here");
 	else
 		local op = res.readLine();
 		local data = res.readAll();
@@ -55,7 +54,7 @@ function call_raw(data)
 			res.close();
 			return data;
 		elseif(op == "ERR") then
-			print(string.format("Error: %s", data));
+			print(string.format("Server responded with error: %s", data));
 			return nil;
 		end
 	end
@@ -63,13 +62,21 @@ end
 
 -- does call to server and appends computer key
 -- @param data post data to send
--- @return content on OK, nil on ERR or exits on critical error
+-- @return content on OK, nil on ERR or s on critical error
 function call(cmd, data)
 	local new_string = string.format("cmd=%s&key=%s", cmd, key);
 	if(data) then
 		new_string = string.format("%s&%s", new_string, data);
 	end
 	return call_raw(new_string);
+end
+
+function call_req(cmd, req_id, data)
+	local new_string = string.format("id=%s", req_id);
+	if(data) then
+		new_string = string.format("%s&%s", new_string, data);
+	end
+	call(cmd, new_string);
 end
 
 function lines(str) 
@@ -80,7 +87,50 @@ function lines(str)
 	return split(str, "\n");
 end
 
+function file_data(str) 
+	local file_id, filename = str:match("([0-9]+) (.+)");
+	return file_id, filename;
+end
+
 -- end help functions
+
+current_write = 0;
+
+-- begin remote call functions
+
+function ls(req_id, file_id, filename)
+	if(not fs.exists(filename)) then
+		print(string.format("[ls] No such file or directory %s", filename));
+		call_req("err", req_id);
+		return;
+	elseif(not fs.isDir(filename)) then
+		print(string.format("[ls] %s is not a directory", filename));
+		call_req("err", req_id);
+		return;
+	else
+		local files = fs.list(filename);
+		local data = "";
+		for _, file in ipairs(files) do
+			local type;
+			if(fs.isDir(file)) then
+				type = "dir";
+			else
+				type = "file";
+			end
+			data = data .. string.format("%s %s\n", type, file);
+		end
+		call_req("ls", req_id, string.format("parent=%d&data=%s", file_id, textutils.urlEncode(data)));
+	end
+end
+
+-- end remote call functions
+
+remote_functions = {
+	ls = function(req_id, cmd, data)
+		local file_id, filename = file_data(data);
+		ls(req_id, cmd, file_id, filename);
+	end
+}
 
 -- begin main code
 
@@ -100,7 +150,13 @@ if(not key) then
 		fh.close();
 	else
 		-- error message should already been printed
-		shell.exit();
+		return;
+	end
+else
+	if(call("hi")) then
+		ls(0, 0, "/");
+	else
+		return;
 	end
 end
 
@@ -108,21 +164,25 @@ print(string.format("Go to %s to interface with this computer\nKEY: %s", server,
 
 -- start main loop
 
-while(true) do
-	local poll = lines(call("poll"));
+--while(true) do
+	--local poll = lines(call("poll"));
 
-	local in_write = 0;
+	--if(poll) then
+		--for index, line in ipairs(poll) do
+			--if(current_write > 0) then
+				--current_write = current_write - 1;
+				---- todo
+			--else
+				--local req_id, cmd, data = line:match("([0-9]+) (%a+) ?(.*)")
+				--fn = remote_functions[cmd];
+				--if(fn) then
+					--fn(req_id, cmd, data);
+				--else
+					--call_req("err",req_id);
+				--end
+			--end
+		--end
+	--end
 
-	if(poll) then
-		for index, line in ipairs(poll) do
-			if(in_write > 0) then
-				in_write = in_write - 1;
-				-- todo
-			else
-				local i,j, id, cmd = string.find(line, "([0-9]+) (.*)")
-			end
-		end
-	end
-
-	sleep(delay);
-end
+	--sleep(delay);
+--end
