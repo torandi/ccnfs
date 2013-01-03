@@ -52,7 +52,7 @@ case "ls":
 
 	if(!$file && $full_filename != "/") error("Unknown directory $full_filename");
 	if($file && $file->type == "file") error("Can't ls a file");
-	$res = execute_command($computer, "ls $file_text_id $full_filename")
+	$res = execute_command($computer, "ls $file_text_id $full_filename");
 	if($res == 1) {
 		$data = array();
 		$data_str = "";

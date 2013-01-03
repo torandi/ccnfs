@@ -68,10 +68,14 @@ case "err":
 	$id = request("id");
 	$command = CommandQueue::from_id($id);
 
+	$data = request("data");
+
 	if($command) {
 		$command->status = 2;
 		$command->commit();
 	}
+
+	write_log("Remote computer responded with error: $data");
 
 	output("OK");
 
@@ -94,25 +98,28 @@ function ls($data, $parent_node) {
 	$files = explode("\n", $data);
 	$names = array();
 	foreach($files as $file) {
-		$split = explode(" ", trim($file), 2);
-		$name = $split[1];
-		$type = $split[0];
-		if($type != "dir" && $type != "file") error("Invalid type for node $name");
-		$names[] = $db->real_escape_string($name);
-		$selection = array('computer_id' => $computer->id, 'name' => $name);
-		if($parent_node == null) {
-			$selection['parent:null'] = null;
-		} else {
-			$selection['parent'] = $parent_node;
-		}
-		if($node = Node::one($selection)) {
-			if($node->type != $type) {
-				$node->type = $type;
+		$file = trim($file);
+		if(!empty($file)) {
+			$split = explode(" ", $file , 2);
+			$name = $split[1];
+			$type = $split[0];
+			if($type != "dir" && $type != "file") error("Invalid type for node $name");
+			$names[] = $db->real_escape_string($name);
+			$selection = array('computer_id' => $computer->id, 'name' => $name);
+			if($parent_node == null) {
+				$selection['parent:null'] = null;
+			} else {
+				$selection['parent'] = $parent_node;
+			}
+			if($node = Node::one($selection)) {
+				if($node->type != $type) {
+					$node->type = $type;
+					$node->commit();
+				}
+			} else {
+				$node = new Node(array('computer_id' => $computer->id, 'name' => $name, 'parent' => $parent_node, 'type' => $type));
 				$node->commit();
 			}
-		} else {
-			$node = new Node(array('computer_id' => $computer->id, 'name' => $name, 'parent' => $parent_node, 'type' => $type));
-			$node->commit();
 		}
 	}
 	$computer_id = $computer->id;
