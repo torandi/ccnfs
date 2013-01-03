@@ -92,6 +92,10 @@ function file_data(str)
 	return file_id, filename;
 end
 
+function is_blank(x)
+  return not not tostring(x):find("^%s*$")
+end
+
 -- end help functions
 
 current_write = 0;
@@ -128,7 +132,7 @@ end
 remote_functions = {
 	ls = function(req_id, cmd, data)
 		local file_id, filename = file_data(data);
-		ls(req_id, cmd, file_id, filename);
+		ls(req_id, file_id, filename);
 	end
 }
 
@@ -172,7 +176,8 @@ while(true) do
 			if(current_write > 0) then
 				current_write = current_write - 1;
 				-- todo
-			else
+			elseif(not is_blank(line)) then
+				print(string.format(">> %s", line))
 				local req_id, cmd, data = line:match("([0-9]+) (%a+) ?(.*)")
 				fn = remote_functions[cmd];
 				if(fn) then
