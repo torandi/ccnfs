@@ -21,6 +21,10 @@
 			<input type="text" name="parent"/>
 			<br/>
 
+			<label>file: </label>
+			<input type="text" name="file"/>
+			<br/>
+
 			<label>Data: </label>
 			<textarea name="data"></textarea>
 			<br/>
