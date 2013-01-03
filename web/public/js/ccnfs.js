@@ -1,4 +1,6 @@
 var key;
+var active_logs = 0;
+
 var dir = {
 	parent: {
 		id: 0,
@@ -66,16 +68,27 @@ function call(cmd, data, callback, error_callback) {
 function call_logged(log, cmd, data, callback, error_callback) {
 	call(cmd, data, function(data) {
 		log.fadeOut().remove();
+		pop_log();
 		callback(data);
 	}, 
 	function() {
 		log.fadeOut().remove();
+		pop_log();
 		if(error_callback) error_callback();
 	});
 }
 
+function pop_log() {
+	--active_logs;
+	if(active_logs == 0) {
+		$("#spinner").fadeOut();
+	}
+}
+
 function create_log(entry) {
 	var log = $("<span>" + entry + "<br/></span>").appendTo("#log");
+	++active_logs;
+	$("#spinner").fadeIn();
 	return log;
 }
 
@@ -88,7 +101,7 @@ function refresh_last_seen() {
 
 function ls(new_dir) {
 	var log = create_log("ls " + new_dir.path);
-	call_logged(log,'ls', {parent: new_dir.parent.id, file: new_dir.path}, function(data) {
+	call_logged(log,'ls', {file: new_dir.id}, function(data) {
 		dir = new_dir;
 		$("#files").children(":not(:first)").remove();
 		$.each(data, function(index, file) {

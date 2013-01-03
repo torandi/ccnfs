@@ -61,14 +61,16 @@ foreach($computer->nodes() as $node) {
 							</p>
 							<p>
 								<input type="button" value="Delete file" id="rm"/>
-								<input type="button" value="Save" id="save"/>
+								<input type="button" value="Save" id="save" style="float: right;"/>
 							</p>
 						</form>
 						</p>
 					</div>
 
 				</div>
-				<p style="clear: both;" class="well" id="log"> </p>
+				<p style="clear: both; padding: 5px; min-height: 32px" class="well" id="log">
+					<img src="ajax-loader.gif" id="spinner" style="float: right; display: none;"/>
+				</p>
 
 			</div>
 			<? } else { ?>
