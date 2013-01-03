@@ -164,25 +164,25 @@ print(string.format("Go to %s to interface with this computer\nKEY: %s", server,
 
 -- start main loop
 
---while(true) do
-	--local poll = lines(call("poll"));
+while(true) do
+	local poll = lines(call("poll"));
 
-	--if(poll) then
-		--for index, line in ipairs(poll) do
-			--if(current_write > 0) then
-				--current_write = current_write - 1;
-				---- todo
-			--else
-				--local req_id, cmd, data = line:match("([0-9]+) (%a+) ?(.*)")
-				--fn = remote_functions[cmd];
-				--if(fn) then
-					--fn(req_id, cmd, data);
-				--else
-					--call_req("err",req_id);
-				--end
-			--end
-		--end
-	--end
+	if(poll) then
+		for index, line in ipairs(poll) do
+			if(current_write > 0) then
+				current_write = current_write - 1;
+				-- todo
+			else
+				local req_id, cmd, data = line:match("([0-9]+) (%a+) ?(.*)")
+				fn = remote_functions[cmd];
+				if(fn) then
+					fn(req_id, cmd, data);
+				else
+					call_req("err",req_id);
+				end
+			end
+		end
+	end
 
-	--sleep(delay);
---end
+	sleep(delay);
+end
