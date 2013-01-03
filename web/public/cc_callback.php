@@ -89,10 +89,11 @@ default:
 
 function ls($data, $parent_node) {
 	global $computer, $db;
+	$data = trim($data);
 	$files = explode("\n", $data);
 	$names = array();
 	foreach($files as $file) {
-		$split = explode(" ", $file, 2);
+		$split = explode(" ", trim($file), 2);
 		$name = $split[1];
 		$type = $split[0];
 		if($type != "dir" && $type != "file") error("Invalid type for node $name");
