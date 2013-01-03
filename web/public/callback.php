@@ -81,7 +81,7 @@ case "write":
 	$data = request("data");
 	$lines = count(explode("\n", $data));
 
-	$res = execute_command($computer, "write $full_filename $lines\n$data");
+	$res = execute_command($computer, "write $lines $full_filename\n$data");
 	if($res == 1) {
 		$file->data = $data;
 		$file->commit();

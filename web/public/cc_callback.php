@@ -80,7 +80,7 @@ case "read":
 	}
 	output("OK");
 	break;
-case "req":
+case "done":
 	$id = request("id");
 	$command = CommandQueue::from_id($id);
 
