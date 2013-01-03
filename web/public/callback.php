@@ -1,6 +1,8 @@
 <?php
 include "../includes.php";
 
+write_log("[callback] ". var_export($_REQUEST, true));
+
 $key = get('key');
 $computer = Computer::from_key($key);
 

@@ -74,3 +74,10 @@ function execute_command($computer, $cmd) {
 	$command->delete();
 	return $status;
 }
+
+function write_log($line) {
+	global $repo_root;
+	$f = fopen("$repo_root/ccnfs.log", 'a');
+	fwrite($f, "$line\n");
+	fclose($f);
+}

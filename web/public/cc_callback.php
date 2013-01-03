@@ -7,6 +7,8 @@ include "../includes.php";
 
 try {
 
+write_log("[cc_callback] ". var_export($_REQUEST, true));
+
 $cmd = request("cmd");
 
 if(!$cmd) {
