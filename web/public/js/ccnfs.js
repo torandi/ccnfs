@@ -111,6 +111,7 @@ function ls(new_dir) {
 	var log = create_log("ls " + new_dir.path);
 	call_logged(log,'ls', {file: new_dir.id}, function(data) {
 		dir = new_dir;
+		$("#cur_dir").html(new_dir.path);
 		$("#files").children(":not(:first)").remove();
 		$.each(data, function(index, file) {
 			$("#files").append("<option value='" + file.id + "' data-is_dir='" + file.is_dir + "'>" + file.name + (file.is_dir ? "/" : "") + "</option>");
