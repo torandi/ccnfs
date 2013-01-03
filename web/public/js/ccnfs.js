@@ -11,7 +11,9 @@ var dir = {
 }
 var file = {
 	id: 0,
-	name: null
+	dir: null,
+	path: null,
+	changed: false
 }
 
 function ccnfs(ckey) {
@@ -36,12 +38,18 @@ function ccnfs(ckey) {
 					var new_dir = {
 						parent: dir,
 						id: new_id,
-						path: sel.html()
+						path: dir.path + sel.html()
 					};
 				}
 				ls(new_dir);
 			} else {
-				//TODO
+				var new_file = {
+					id: new_id,
+					dir: dir,
+					path: dir.path + sel.html(),
+					changed: false
+				};
+				read(new_file);
 			}
 		});
 
@@ -109,3 +117,17 @@ function ls(new_dir) {
 		})
 	});
 }
+
+function read(new_file) {
+	if(file.changed && !confirm("The file has changed, discard changes?")) return;
+	var log = create_log("read " + new_file.path);
+	call_logged(log,'read', {file: new_file.id}, function(data) {
+		file = new_file;
+		file.changed = false;
+		$("#content").text(data);
+		$("#cur_file").html(new_file.path);
+		$("#file").fadeIn();
+	});
+}
+
+
