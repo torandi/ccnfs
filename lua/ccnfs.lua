@@ -72,11 +72,16 @@ function call(cmd, data)
 end
 
 function call_req(cmd, req_id, data)
-	local new_string = string.format("id=%s", req_id);
+	local new_string = string.format("id=%d", req_id);
 	if(data) then
 		new_string = string.format("%s&%s", new_string, data);
 	end
 	call(cmd, new_string);
+end
+
+function req_error(req_id, msg)
+	print("Error: " .. msg);
+	call_req("err", req_id, "data=" .. msg);
 end
 
 function lines(str) 
@@ -104,12 +109,10 @@ current_write = 0;
 
 function ls(req_id, file_id, filename)
 	if(not fs.exists(filename)) then
-		print(string.format("[ls] No such file or directory %s", filename));
-		call_req("err", req_id);
+		req_error(req_id, string.format("[ls] No such file or directory %s", filename));
 		return;
 	elseif(not fs.isDir(filename)) then
-		print(string.format("[ls] %s is not a directory", filename));
-		call_req("err", req_id);
+		req_error(req_id, string.format("[ls] %s is not a directory", filename));
 		return;
 	else
 		local files = fs.list(filename);
@@ -127,12 +130,33 @@ function ls(req_id, file_id, filename)
 	end
 end
 
+function read(req_id, file_id, filename) 
+	if(not fs.exists(filename)) then
+		req_error(req_id, string.format("[read] No such file or directory %s", filename));
+		return;
+	elseif(fs.isDir(filename)) then
+		req_error(req_id, string.format("[read] %s is a directory", filename));
+		call_req("err", req_id);
+		return;
+	else
+		local file = fs.open(filename, "r");
+		local data = file.readAll();
+		file.close();
+		call_req("read", req_id, string.format("file=%d&data=%s", file_id, textutils.urlEncode(data)));
+	end
+end
+
+
 -- end remote call functions
 
 remote_functions = {
 	ls = function(req_id, cmd, data)
 		local file_id, filename = file_data(data);
 		ls(req_id, file_id, filename);
+	end,
+	read = function(req_id, cmd, data) 
+		local file_id, filename = file_data(data);
+		read(req_id, file_id, filename);
 	end
 }
 
@@ -183,7 +207,7 @@ while(true) do
 				if(fn) then
 					fn(req_id, cmd, data);
 				else
-					call_req("err",req_id);
+					req_error(req_id, "Unknown command " .. cmd);
 				end
 			end
 		end
