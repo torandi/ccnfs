@@ -3,6 +3,8 @@
 server = "http://ccnfs.torandi.com";
 config_file = "ccnfs.config";
 
+delay = 5
+
 -- end config
 
 url = string.format("%s/cc_callback.php", server);
@@ -63,11 +65,19 @@ end
 -- @param data post data to send
 -- @return content on OK, nil on ERR or exits on critical error
 function call(cmd, data)
-	local new_string = string.format("cmd=%s&key=%s",key);
+	local new_string = string.format("cmd=%s&key=%s", cmd, key);
 	if(data) then
 		new_string = string.format("%s&%s", new_string, data);
 	end
 	return call_raw(new_string);
+end
+
+function lines(str) 
+	if(not str) then
+		return nil;
+	end
+
+	return split(str, "\n");
 end
 
 -- end help functions
@@ -95,3 +105,24 @@ if(not key) then
 end
 
 print(string.format("Go to %s to interface with this computer\nKEY: %s", server, key));
+
+-- start main loop
+
+while(true) do
+	local poll = lines(call("poll"));
+
+	local in_write = 0;
+
+	if(poll) then
+		for index, line in ipairs(poll) do
+			if(in_write > 0) then
+				in_write = in_write - 1;
+				-- todo
+			else
+				local i,j, id, cmd = string.find(line, "([0-9]+) (.*)")
+			end
+		end
+	end
+
+	sleep(delay);
+end
