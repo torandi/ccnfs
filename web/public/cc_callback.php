@@ -52,7 +52,7 @@ case "ls":
 	$command = CommandQueue::from_id($id);
 
 	$parent = request("parent");
-	if(!$parent) error("Missing argument: parent\n");
+	if($parent == null) error("Missing argument: parent\n");
 	if($parent == 0) $parent = null;
 	if($parent != null && Node::count(array('id'=>$parent)) < 1) error("Parent node $parent not found");
 	ls(request("data"), $parent);
