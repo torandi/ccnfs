@@ -20,7 +20,7 @@ $filename = get("file");
 $parent = get("parent");
 $selection = array('computer_id' => $computer->id, 'name' => $filename);
 
-if($parent == "null") $parent = null;
+if($parent == 0) $parent = null;
 
 if($parent == null) {
 	$selection['parent:null'] = null;
@@ -32,15 +32,22 @@ $file = Node::one($selection);
 
 $file_id = $file ? $file->id : null;
 
-$file_text_id = $file ? $file->id : "null";
+$file_text_id = $file ? $file->id : 0;
+
+if($file) {
+	$full_filename = $file->full_path();
+} else {
+	$full_filename = $filename;
+	if($full_filename == "") $full_filename = "/";
+}
 
 switch($cmd) {
 case "ls":
-	if($filename == "") $filename = "/";
-	if(!$file && $filename != "/") error("Unknown directory $filename");
+
+	if(!$file && $full_filename != "/") error("Unknown directory $full_filename");
 	if($file && $file->type == "file") error("Can't ls a file");
 
-	if(execute_command($computer, "ls $file_text_id $filename")) {
+	if($res = execute_command($computer, "ls $file_text_id $full_filename") == 1) {
 		$data = array();
 		$selection = array('computer_id' => $computer->id);
 		if($file_id) {
@@ -57,8 +64,10 @@ case "ls":
 			}
 		}
 		output("OK", $format ? $data : $data_str);
-	} else {
+	} else if($res == 0) {
 		error("Command timed out");
+	} else {
+		error("Remote computer responded with error.");
 	}
 	break;
 default:

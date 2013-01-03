@@ -68,9 +68,9 @@ function execute_command($computer, $cmd) {
 	for($tries=0; $tries<10; ++$tries) {
 		sleep(2);
 		$command = CommandQueue::from_id($id);
-		if($command->status == 1) break;
+		if($command->status != 0) break;
 	}
 	$status = $command->status;
 	$command->delete();
-	return ($status == 1);
+	return $status;
 }

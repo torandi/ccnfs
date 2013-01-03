@@ -33,8 +33,8 @@ case "hi":
 			error("Server failed to generate unique key, report to ccnfs admin");
 		}
 	} else {
-		$data = request("data");
-		ls($data, null);
+		/*$data = request("data");
+		ls($data, null);*/
 		output("OK");
 	}
 	break;
@@ -51,7 +51,7 @@ case "ls":
 
 	$parent = request("parent");
 	if(!$parent) error("Missing argument: parent\n");
-	if($parent == "null") $parent = null;
+	if($parent == 0) $parent = null;
 	if($parent != null && Node::count(array('id'=>$parent)) < 1) error("Parent node $parent not found");
 	ls(request("data"), $parent);
 
@@ -61,6 +61,17 @@ case "ls":
 	}
 	output("OK");
 	break;
+case "err":
+	$id = request("id");
+	$command = CommandQueue::from_id($id);
+
+	if($command) {
+		$command->status = 2;
+		$command->commit();
+	}
+
+	output("OK");
+
 default:
 	error("Unknown command");
 }
