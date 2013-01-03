@@ -3,7 +3,10 @@
 server = "http://ccnfs.torandi.com";
 config_file = "ccnfs.config";
 
-delay = 5
+max_delay = 10
+min_delay = 2
+
+cur_delay = min_delay
 
 -- end config
 
@@ -119,7 +122,7 @@ function ls(req_id, file_id, filename)
 		local data = "";
 		for _, file in ipairs(files) do
 			local type;
-			if(fs.isDir(file)) then
+			if(fs.isDir(fs.combine(filename, file))) then
 				type = "dir";
 			else
 				type = "file";
@@ -195,6 +198,8 @@ print(string.format("Go to %s to interface with this computer\nKEY: %s", server,
 while(true) do
 	local poll = lines(call("poll"));
 
+	local any = false;
+
 	if(poll) then
 		for index, line in ipairs(poll) do
 			if(current_write > 0) then
@@ -202,6 +207,7 @@ while(true) do
 				-- todo
 			elseif(not is_blank(line)) then
 				print(string.format(">> %s", line))
+				any = true;
 				local req_id, cmd, data = line:match("([0-9]+) (%a+) ?(.*)")
 				fn = remote_functions[cmd];
 				if(fn) then
@@ -213,5 +219,10 @@ while(true) do
 		end
 	end
 
-	sleep(delay);
+	if(any) then
+		cur_delay = min_delay;
+	elseif (cur_delay < max_delay) then
+		cur_delay = cur_delay + 1;
+	end
+	sleep(cur_delay);
 end
