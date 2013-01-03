@@ -64,6 +64,24 @@ case "ls":
 	}
 	output("OK");
 	break;
+case "read":
+	$id = request("id");
+	$command = CommandQueue::from_id($id);
+
+	$file_id = request("file");
+	if($file_id == null) error("Missing argument: file\n");
+	$file = Node::from_id($file_id);
+	if(!$file) error("Unknown file id");
+	if($file->type != "file") error("Node is not a file");
+
+	read(request("data"), $file);
+
+	if($command) {
+		$command->status = 1;
+		$command->commit();
+	}
+	output("OK");
+	break;
 case "err":
 	$id = request("id");
 	$command = CommandQueue::from_id($id);
@@ -131,6 +149,11 @@ function ls($data, $parent_node) {
 		$stmt->bind_param('i', $computer_id);
 	}
 	$stmt->execute();
+}
+
+function read($data, $file) {
+	$file->data = $data;
+	$file->commit();
 }
 
 ?>

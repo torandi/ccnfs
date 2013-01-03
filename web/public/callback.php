@@ -18,30 +18,23 @@ if(!$cmd) {
 	error("Command missing");
 }
 
-$filename = str_replace("/", "", request("file"));
-$parent = request("parent");
+$file_id = request("file");
 
-$selection = array('computer_id' => $computer->id, 'name' => $filename);
-
-if($parent == 0) $parent = null;
-
-if($parent == null) {
-	$selection['parent:null'] = null;
-} else {
-	$selection['parent'] = $parent;
-}
-
-$file = Node::one($selection);
-
-$file_id = $file ? $file->id : null;
+$file = Node::from_id($file_id);
 
 $file_text_id = $file ? $file->id : 0;
 
 if($file) {
 	$full_filename = $file->full_path();
+} else if($file_id == 0) {
+	$file_id = null;
+	$full_filename = "/";
 } else {
-	$full_filename = $filename;
-	if($full_filename == "") $full_filename = "/";
+	error("No file with id $file_id");
+}
+
+if($file && $file->computer_id != $computer->id) {
+	error("No file with id $file_id");
 }
 
 switch($cmd) {
@@ -50,8 +43,7 @@ case "last_seen":
 	break;
 case "ls":
 
-	if(!$file && $full_filename != "/") error("Unknown directory $full_filename");
-	if($file && $file->type == "file") error("Can't ls a file");
+	if($file && $file->type != "dir") error("Node is not a directory");
 	$res = execute_command($computer, "ls $file_text_id $full_filename");
 	if($res == 1) {
 		$data = array();
@@ -64,6 +56,19 @@ case "ls":
 			}
 		}
 		output("OK", $format ? $data : $data_str);
+	} else if($res == 0) {
+		error("Command timed out");
+	} else {
+		error("Remote computer responded with error.");
+	}
+	break;
+case "read":
+	if(!$file || $file->type != "file") error("Node is not a file");
+
+	$res = execute_command($computer, "read $file_text_id $full_filename");
+	if($res == 1) {
+		$file = Node::from_id($file_id);
+		output("OK", $file->data);
 	} else if($res == 0) {
 		error("Command timed out");
 	} else {
