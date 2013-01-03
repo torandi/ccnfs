@@ -40,13 +40,9 @@ case "hi":
 	break;
 case "poll":
 	$queue = CommandQueue::selection(array('computer_id' => $computer->id, 'status'=>0));
-	if(count($queue) > 0) {
-		echo "OK\n";
-		foreach($queue as $command) {
-			echo "{$command->id} {$command->command}\n";
-		}
-	} else {
-		echo "NOP\n";
+	echo "OK\n";
+	foreach($queue as $command) {
+		echo "{$command->id} {$command->command}\n";
 	}
 	break;
 case "ls":
