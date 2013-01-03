@@ -18,8 +18,9 @@ if(!$cmd) {
 	error("Command missing");
 }
 
-$filename = request("file");
+$filename = str_replace("/", "", request("file"));
 $parent = request("parent");
+
 $selection = array('computer_id' => $computer->id, 'name' => $filename);
 
 if($parent == 0) $parent = null;

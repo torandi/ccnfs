@@ -16,11 +16,34 @@ function ccnfs(ckey) {
 	key = ckey;
 	$(function() {
 
-	$("#dir_refresh").click(function() {
-		ls(dir)
-	});
+		$("#dir_refresh").click(function() {
+			ls(dir)
+		});
 
-	refresh_last_seen();
+		$("#files option").click(function() {
+			var sel = $("#files option:selected");
+			var new_id = parseInt(sel.attr("value"));
+			var is_dir = sel.data("is_dir");
+			if(is_dir) {
+				var new_dir;
+				if(new_id == 0 && dir.id != 0) {
+					new_dir = dir.parent;
+				} else if(new_id == 0) {
+					new_dir = dir;
+				} else {
+					var new_dir = {
+						parent: dir,
+						id: new_id,
+						path: sel.html()
+					};
+				}
+				ls(new_dir);
+			} else {
+				//TODO
+			}
+		});
+
+		refresh_last_seen();
 	});
 }
 
