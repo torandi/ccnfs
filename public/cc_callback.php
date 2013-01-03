@@ -39,6 +39,31 @@ case "hi":
 	}
 	break;
 case "poll":
+	$queue = CommandQueue::selection(array('computer_id' => $computer->id, 'status'=>0));
+	if(count($queue) > 0) {
+		echo "OK\n";
+		foreach($queue as $command) {
+			echo "{$command->id} {$command->command}\n";
+		}
+	} else {
+		echo "NOP\n";
+	}
+	break;
+case "ls":
+	$id = request("id");
+	$command = CommandQueue::from_id($id);
+
+	$parent = request("parent");
+	if(!$parent) error("Missing argument: parent\n");
+	if($parent == "null") $parent = null;
+	if($parent != null && Node::count(array('id'=>$parent)) < 1) error("Parent node $parent not found");
+	ls(request("data"), $parent);
+
+	if($command) {
+		$command->status = 1;
+		$command->commit();
+	}
+	output("OK");
 	break;
 default:
 	error("Unknown command");
@@ -48,19 +73,6 @@ default:
 	error("Server exception: $e");
 }
 
-/*
- * Functions
- */
-
-function output($op, $data="") {
-	echo "$op\n";
-	echo $data;
-	exit();
-}
-
-function error($msg) {
-	output("ERR",$msg);
-}
 
 /**
  * Input handlers

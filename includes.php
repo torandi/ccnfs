@@ -18,6 +18,4 @@ function __autoload($class)
 	}
 }
 
-session_start();
-
 include "db.php";

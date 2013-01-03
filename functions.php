@@ -1,5 +1,7 @@
 <?php
 
+$format = 0; //Set to 1 to format with json
+
 function request($var, $default=NULL) {
 	if(isset($_REQUEST[$var])) 
 		return $_REQUEST[$var];
@@ -25,6 +27,12 @@ function redirect($url) {
 	header("Location: $url");
 }
 
+function output_json($data) {
+	header("Content-Type: text/json");
+	echo json_encode($data);
+	exit();
+}
+
 function random_string ($length = 8) {
 	$randstr = "";
 
@@ -35,4 +43,34 @@ function random_string ($length = 8) {
 	 $randstr .= $char;
 	}
 	return $randstr;
+}
+
+function output($op, $data="") {
+	global $format;
+	if(!$format) {
+		echo "$op\n";
+		echo $data;
+	} else {
+		output_json(array('status'=>$op, 'data'=>$data));
+	}
+	exit();
+}
+
+function error($msg) {
+	output("ERR",$msg);
+}
+
+function execute_command($computer, $cmd) {
+	$command = new CommandQueue(array('computer_id' => $computer->id, 'command' => $cmd));
+	$command->commit();
+
+	$id = $command->id;
+	for($tries=0; $tries<10; ++$tries) {
+		sleep(2);
+		$command = CommandQueue::from_id($id);
+		if($command->status == 1) break;
+	}
+	$status = $command->status;
+	$command->delete();
+	return ($status == 1);
 }

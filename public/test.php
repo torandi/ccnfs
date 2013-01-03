@@ -13,6 +13,13 @@
 			<input type="text" name="new"/>
 			<br/>
 
+			<label>Id: </label>
+			<input type="text" name="id"/>
+			<br/>
+
+			<label>Parent: </label>
+			<input type="text" name="parent"/>
+			<br/>
 
 			<label>Data: </label>
 			<textarea name="data"></textarea>
