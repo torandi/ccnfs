@@ -20,7 +20,7 @@ function ccnfs(ckey) {
 			ls(dir)
 		});
 
-		$("#files option").click(function() {
+		$("#files option").live('click',function() {
 			var sel = $("#files option:selected");
 			var new_id = parseInt(sel.attr("value"));
 			var is_dir = sel.data("is_dir");
