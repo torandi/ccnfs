@@ -106,7 +106,11 @@ end
 
 -- end help functions
 
-current_write = 0;
+current_write = {
+	lines_left = 0,
+	fh = nil,
+	req_id = nil,
+}
 
 -- begin remote call functions
 
@@ -149,6 +153,26 @@ function read(req_id, file_id, filename)
 	end
 end
 
+function write(req_id, num_lines, filename)
+	if(fs.isReadOnly(filename)) then
+		req_error(req_id, string.format("[write] %s is read only\n", filename));
+		return;
+	else
+		current_write.lines_left = tonumber(num_lines);
+		current_write.fh = fs.open(filename, "w");
+		current_write.req_id = req_id;
+	end
+end
+
+function write_line(line) 
+	current_write.fh.writeLine(line);
+
+	current_write.lines_left = current_write.lines_left - 1;
+	if(current_write.lines_left == 0) then
+		current_write.fh.close();
+		call_req("done",current_write.req_id);
+	end
+end
 
 -- end remote call functions
 
@@ -160,6 +184,10 @@ remote_functions = {
 	read = function(req_id, cmd, data) 
 		local file_id, filename = file_data(data);
 		read(req_id, file_id, filename);
+	end,
+	write = function(req_id, cmd, data)
+		local lines, filename = file_data(data);
+		write(req_id, lines, filename);
 	end
 }
 
@@ -202,9 +230,8 @@ while(true) do
 
 	if(poll) then
 		for index, line in ipairs(poll) do
-			if(current_write > 0) then
-				current_write = current_write - 1;
-				-- todo
+			if(current_write.lines_left > 0) then
+				write_line(line);
 			elseif(not is_blank(line)) then
 				print(string.format(">> %s", line))
 				any = true;
