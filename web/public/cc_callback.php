@@ -36,8 +36,6 @@ case "hi":
 			error("Server failed to generate unique key, report to ccnfs admin");
 		}
 	} else {
-		/*$data = request("data");
-		ls($data, null);*/
 		output("OK");
 	}
 	break;
@@ -75,6 +73,16 @@ case "read":
 	if($file->type != "file") error("Node is not a file");
 
 	read(request("data"), $file);
+
+	if($command) {
+		$command->status = 1;
+		$command->commit();
+	}
+	output("OK");
+	break;
+case "req":
+	$id = request("id");
+	$command = CommandQueue::from_id($id);
 
 	if($command) {
 		$command->status = 1;

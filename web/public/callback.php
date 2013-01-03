@@ -75,6 +75,23 @@ case "read":
 		error("Remote computer responded with error.");
 	}
 	break;
+case "write":
+	if(!$file || $file->type != "file") error("Node is not a file");
+
+	$data = request("data");
+	$lines = count(explode("\n", $data));
+
+	$res = execute_command($computer, "write $full_filename $lines\n$data");
+	if($res == 1) {
+		$file->data = $data;
+		$file->commit();
+		output("OK");
+	} else if($res == 0) {
+		error("Command timed out");
+	} else {
+		error("Remote computer responded with error.");
+	}
+	break;
 default:
 	error("Unknown command $cmd");
 }

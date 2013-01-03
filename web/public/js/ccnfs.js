@@ -24,6 +24,8 @@ function ccnfs(ckey) {
 			ls(dir)
 		});
 
+		$("#save").click(write);
+
 		$("#files option").live('click',function() {
 			var sel = $("#files option:selected");
 			var new_id = parseInt(sel.attr("value"));
@@ -125,10 +127,15 @@ function read(new_file) {
 	call_logged(log,'read', {file: new_file.id}, function(data) {
 		file = new_file;
 		file.changed = false;
-		$("#content").text(data);
+		$("#content").val(data);
 		$("#cur_file").html(new_file.path);
 		$("#file").fadeIn();
 	});
 }
 
-
+function write() {
+	var log = create_log("write " + file.path);
+	call_logged(log,'write', {file: file.id, data: $("#content").val()}, function(data) {
+		file.changed = false;
+	});
+}
