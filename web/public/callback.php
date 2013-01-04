@@ -100,8 +100,13 @@ case "rm":
 
 	$res = execute_command($computer, "rm $full_filename", false);
 	if($res == 1) {
-		$file->delete();
-		output("OK");
+		$file = Node::from_id($file_id);
+		if($file) {
+			$file->delete();
+			output("OK");
+		} else {
+			error("File is already deleted");
+		}
 	} else if($res == 0) {
 		error("Command timed out");
 	} else {
