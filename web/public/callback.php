@@ -7,6 +7,7 @@ $key = request('key');
 $computer = Computer::from_key($key);
 
 if(request("format")) $format = 1;
+if(request("cached")) $use_cache = 1;
 
 if(!$computer) {
 	error("Computer not found or key missing");
@@ -44,7 +45,7 @@ case "last_seen":
 case "ls":
 
 	if($file && $file->type != "dir") error("Node is not a directory");
-	$res = execute_command($computer, "ls $file_text_id $full_filename");
+	$res = execute_command($computer, "ls $file_text_id $full_filename", true);
 	if($res == 1) {
 		$data = array();
 		$data_str = "";
@@ -65,7 +66,7 @@ case "ls":
 case "read":
 	if(!$file || $file->type != "file") error("Node is not a file");
 
-	$res = execute_command($computer, "read $file_text_id $full_filename");
+	$res = execute_command($computer, "read $file_text_id $full_filename", ($file->data != null));
 	if($res == 1) {
 		$file = Node::from_id($file_id);
 		output("OK", $file->data);
@@ -81,7 +82,7 @@ case "write":
 	$data = request("data");
 	$lines = count(explode("\n", $data));
 
-	$res = execute_command($computer, "write $lines $full_filename\n$data");
+	$res = execute_command($computer, "write $lines $full_filename\n$data", false);
 	if($res == 1) {
 		$file->data = $data;
 		$file->commit();
@@ -92,8 +93,21 @@ case "write":
 		error("Remote computer responded with error.");
 	}
 	break;
+case "rm":
+	if(!$file) error("No such file or directory");
+
+	$res = execute_command($computer, "rm $file_text_id $full_filename", false);
+	if($res == 1) {
+		$file->delete();
+		output("OK");
+	} else if($res == 0) {
+		error("Command timed out");
+	} else {
+		error("Remote computer responded with error.");
+	}
+	break;
 case "mknod":
-	if($file && $file->type != "dir") error("Node is not a directory");
+	if($file && $file->type != "dir") error("Node is not a directory", false);
 
 	$filename = request("filename");
 	if(substr($full_filename, -1) != "/") $full_filename .= "/";
@@ -113,7 +127,7 @@ case "mknod":
 	}
 	break;
 case "mkdir":
-	if($file && $file->type != "dir") error("Node is not a directory");
+	if($file && $file->type != "dir") error("Node is not a directory", false);
 
 	$filename = request("filename");
 	if(substr($full_filename, -1) != "/") $full_filename .= "/";

@@ -45,6 +45,14 @@ function ccnfs(ckey) {
 			}
 		});
 
+		$("#rm").click(function() {
+			var sel = $("#files option:selected");
+			var file_id = parseInt(sel.attr("value"));
+			var file_path = dir.path + sel.html();
+			if(!confirm("Delete "+ file_path + "?")) return;
+			rm(file_id, file_path);
+		});
+
 
 		$("#files option").live('click',function() {
 			var sel = $("#files option:selected");
@@ -83,6 +91,9 @@ function call(cmd, data, callback, error_callback) {
 	data['cmd'] = cmd;
 	data['format'] = "true";
 	data['key'] = key;
+	if($("#cached").attr("checked")) {
+		data['cached'] = "true";
+	}
 	$.post("callback.php", data, function(data) {
 		if(data.status == "OK") {
 			$("#error").fadeOut();
@@ -158,6 +169,15 @@ function write() {
 	call_logged(log,'write', {file: file.id, data: $("#content").val()}, function(data) {
 		file.changed = false;
 	});
+}
+
+function rm(file_id, filepath) {
+	var log = create_log("rm " + filepath);
+	call_logged(log,'mknod', {file: file_id}, function(data) {
+		$("#file").fadeOut();
+		file.id = null;
+	});
+	ls(dir);
 }
 
 function create_file(name) {

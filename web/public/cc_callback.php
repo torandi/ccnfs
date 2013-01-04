@@ -56,10 +56,7 @@ case "ls":
 	if($parent != null && Node::count(array('id'=>$parent)) < 1) error("Parent node $parent not found");
 	ls(request("data"), $parent);
 
-	if($command) {
-		$command->status = 1;
-		$command->commit();
-	}
+	update_command($command, 1);
 	output("OK");
 	break;
 case "read":
@@ -74,20 +71,14 @@ case "read":
 
 	read(request("data"), $file);
 
-	if($command) {
-		$command->status = 1;
-		$command->commit();
-	}
+	update_command($command, 1);
 	output("OK");
 	break;
 case "done":
 	$id = request("id");
 	$command = CommandQueue::from_id($id);
 
-	if($command) {
-		$command->status = 1;
-		$command->commit();
-	}
+	update_command($command, 1);
 	output("OK");
 	break;
 case "err":
@@ -96,10 +87,7 @@ case "err":
 
 	$data = request("data");
 
-	if($command) {
-		$command->status = 2;
-		$command->commit();
-	}
+	update_command($command, 2);
 
 	write_log("Remote computer responded with error: $data");
 
@@ -162,6 +150,15 @@ function ls($data, $parent_node) {
 function read($data, $file) {
 	$file->data = $data;
 	$file->commit();
+}
+
+function update_command($command, $status) {
+	if($command && !$command->cached) {
+		$command->status = 1;
+		$command->commit();
+	} else if($command()) {
+		$command->delete();
+	}
 }
 
 ?>

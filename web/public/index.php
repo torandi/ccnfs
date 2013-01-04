@@ -28,6 +28,7 @@ $computer = Computer::from_key($key);
 				<h2>Connected to computer <?=$computer->key?></h2>
 				<p class='alert alert-error' style='display: none' id="error"></p>
 				<p><i id="last_seen">Last seen <?=$computer->formated_last_seen()?></i><p>
+				<p><form><input type="checkbox" id="cached"/><label style="display: inline; margin-left: 5px;" for="cached">Use cached data if available</label></form></p>
 				<div>
 					<div id="directory" style="float: left">
 						<form id="dir_form">
@@ -46,8 +47,9 @@ foreach($computer->nodes() as $node) {
 							</select>
 							</p>
 							<p>
-								<input type="button" value="New directory" id="mkdir"/>
 								<input type="button" value="New file" id="mkfile"/>
+								<input type="button" value="Delete" id="rm" style="float: right;"/> <br/>
+								<input type="button" value="New directory" id="mkdir"/>
 							</p>
 						</form>
 						</p>

@@ -1,6 +1,7 @@
 <?php
 
 $format = 0; //Set to 1 to format with json
+$use_cache = 0; //set to 1 to use cache if possible
 
 function request($var, $default=NULL) {
 	if(isset($_REQUEST[$var])) 
@@ -60,19 +61,27 @@ function error($msg) {
 	output("ERR",$msg);
 }
 
-function execute_command($computer, $cmd) {
-	$command = new CommandQueue(array('computer_id' => $computer->id, 'command' => $cmd));
+function execute_command($computer, $cmd, $allow_caching = false) {
+	global $use_cache;
+
+	$cached = ($use_cache && $allow_caching);
+
+	$command = new CommandQueue(array('computer_id' => $computer->id, 'command' => $cmd, 'cached' => $cached));
 	$command->commit();
 
-	$id = $command->id;
-	for($tries=0; $tries<10; ++$tries) {
-		sleep(2);
-		$command = CommandQueue::from_id($id);
-		if($command->status != 0) break;
+	if(!$cached) {
+		$id = $command->id;
+		for($tries=0; $tries<10; ++$tries) {
+			sleep(2);
+			$command = CommandQueue::from_id($id);
+			if($command->status != 0) break;
+		}
+		$status = $command->status;
+		$command->delete();
+		return $status;
+	} else {
+		return 1;
 	}
-	$status = $command->status;
-	$command->delete();
-	return $status;
 }
 
 function write_log($line) {
