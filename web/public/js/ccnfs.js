@@ -251,5 +251,6 @@ function create_dir(name) {
 function set_editor(new_value) {
 	editor.setValue(new_value);
 	editor.clearSelection();
+	editor.scrollToRow(0);
 	file.changed = false;
 }
