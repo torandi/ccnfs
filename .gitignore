@@ -1,3 +1,4 @@
 settings.php
 *.swp
 .console_history
+web/public/js/ace
