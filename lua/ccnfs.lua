@@ -164,6 +164,19 @@ function write(req_id, num_lines, filename)
 	end
 end
 
+function mkdir(req_id, filename)
+	if(fs.isReadOnly(filename)) then
+		req_error(req_id, string.format("[mkdir] %s is read only\n", filename));
+		return;
+	elseif (fs.exists(filename)) then
+		req_error(req_id, string.format("[mkdir] %s : file exists\n", filename));
+		return;
+	else
+		fs.makeDir(filename);
+		call_req("done", req_id);
+	end
+end
+
 function write_line(line) 
 	current_write.fh.writeLine(line);
 
@@ -174,21 +187,23 @@ function write_line(line)
 	end
 end
 
+
 -- end remote call functions
 
 remote_functions = {
-	ls = function(req_id, cmd, data)
+	ls = function(req_id, data)
 		local file_id, filename = file_data(data);
 		ls(req_id, file_id, filename);
 	end,
-	read = function(req_id, cmd, data) 
+	read = function(req_id, data) 
 		local file_id, filename = file_data(data);
 		read(req_id, file_id, filename);
 	end,
-	write = function(req_id, cmd, data)
+	write = function(req_id, data)
 		local lines, filename = file_data(data);
 		write(req_id, lines, filename);
-	end
+	end,
+	mkdir = mkdir
 }
 
 -- begin main code
@@ -238,7 +253,7 @@ while(true) do
 				local req_id, cmd, data = line:match("([0-9]+) (%a+) ?(.*)")
 				fn = remote_functions[cmd];
 				if(fn) then
-					fn(req_id, cmd, data);
+					fn(req_id, data);
 				else
 					req_error(req_id, "Unknown command " .. cmd);
 				end
