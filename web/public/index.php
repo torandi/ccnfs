@@ -14,6 +14,7 @@ $computer = Computer::from_key($key);
 		<title>ComputerCraft Network File System</title>
 		<script src="js/jquery.js" type="text/javascript"></script>
 		<script src="js/ccnfs.js" type="text/javascript"></script>
+		<script src="js/ace/ace.js" type="text/javascript" charset="utf-8"></script>
 		<link type="text/css" rel="stylesheet" href="bootstrap.min.css" />
 	</head>
 	<body>
@@ -55,16 +56,14 @@ foreach($computer->nodes() as $node) {
 						</p>
 					</div>
 
-					<div id="file" style="float: left; margin-left: 10px; display: none;">
-						<p> <strong>File: </strong> <span id="cur_file">-</span> </p>
+					<div id="file" style="float: left; margin-left: 10px; width: 500px;">
 						<form id="file_form">
-							<p>
-							<textarea id="content" rows="20" style="width: 500px;"></textarea>
-							</p>
-							<p>
-								<input type="button" value="Run file" id="run"/>
+							<p> 
+								<strong>File: </strong> <span id="cur_file">-</span>
 								<input type="button" value="Save" id="save" style="float: right;"/>
+								<input type="button" value="Run file" id="run" style="float: right;"/>
 							</p>
+							<div id="content" style="width: 500px; height: 400px"></div>
 						</form>
 						</p>
 					</div>

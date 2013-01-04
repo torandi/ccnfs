@@ -1,5 +1,6 @@
 var key;
 var active_logs = 0;
+var editor;
 
 var dir = {
 	parent: {
@@ -22,6 +23,12 @@ function ccnfs(ckey) {
 	key = ckey;
 	$(function() {
 
+		ace.config.set("workerPath", "js/ace");
+		editor = ace.edit("content");
+		editor.setTheme("ace/theme/eclipse");
+		editor.getSession().setMode("ace/mode/lua");
+
+
 		$("#dir_refresh").click(function() {
 			ignore_cached  = true;
 			ls(dir)
@@ -30,7 +37,7 @@ function ccnfs(ckey) {
 
 		$("#save").click(write);
 
-		$("#content").keypress(function() {
+		editor.getSession().on("change", function(e) {
 			file.changed = true;
 		});
 
@@ -97,6 +104,7 @@ function ccnfs(ckey) {
 				read(new_file);
 			}
 		});
+
 
 		refresh_last_seen();
 	});
@@ -174,7 +182,7 @@ function read(new_file) {
 	call_logged(log,'read', {file: new_file.id}, function(data) {
 		file = new_file;
 		file.changed = false;
-		$("#content").val(data);
+		editor.setValue(data);
 		$("#cur_file").html(new_file.path);
 		$("#file").fadeIn();
 	});
@@ -182,7 +190,7 @@ function read(new_file) {
 
 function write() {
 	var log = create_log("write " + file.path);
-	call_logged(log,'write', {file: file.id, data: $("#content").val()}, function(data) {
+	call_logged(log,'write', {file: file.id, data: editor.getValue()}, function(data) {
 		file.changed = false;
 	});
 }
@@ -212,7 +220,7 @@ function create_file(name) {
 		file = new_file;
 		file.changed = false;
 		file.id = parseInt(data);
-		$("#content").val("");
+		editor.setValue("");
 		$("#cur_file").html(new_file.path);
 		$("#file").fadeIn();
 
