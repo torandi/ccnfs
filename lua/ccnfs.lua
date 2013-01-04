@@ -11,6 +11,7 @@ cur_delay = min_delay
 -- end config
 
 url = string.format("%s/cc_callback.php", server);
+version = "0.1 BETA"
 
 -- begin help functions
 
@@ -223,7 +224,6 @@ remote_functions = {
 
 -- begin main code
 
-version = "0.1 ALPHA"
 print(string.format("ComputerCraft Network FileSystem %s\n  Author: Torandi\n", version));
 
 load_config();
