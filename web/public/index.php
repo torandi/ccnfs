@@ -62,7 +62,7 @@ foreach($computer->nodes() as $node) {
 							<textarea id="content" rows="20" style="width: 500px;"></textarea>
 							</p>
 							<p>
-								<input type="button" value="Delete file" id="rm"/>
+								<input type="button" value="Run file" id="run"/>
 								<input type="button" value="Save" id="save" style="float: right;"/>
 							</p>
 						</form>

@@ -58,6 +58,16 @@ function ccnfs(ckey) {
 			rm(file_id, file_path);
 		});
 
+		$("#run").click(function() {
+			var sel = $("#files option:selected");
+			var file_id = parseInt(sel.attr("value"));
+			var file_path = dir.path + sel.html();
+			if(sel.data("is_dir")) {
+				alert("You can't run a directory :D");
+				return;
+			}
+			run(file_id, file_path);
+		});
 
 		$("#files option").live('click',function() {
 			var sel = $("#files option:selected");
@@ -102,7 +112,8 @@ function call(cmd, data, callback, error_callback) {
 	$.post("callback.php", data, function(data) {
 		if(data.status == "OK") {
 			$("#error").fadeOut();
-			callback(data.data);
+			
+			if(callback) callback(data.data);
 		} else {
 			$("#error").html(cmd + ": " +data.data);
 			$("#error").fadeIn();
@@ -115,7 +126,7 @@ function call_logged(log, cmd, data, callback, error_callback) {
 	call(cmd, data, function(data) {
 		log.fadeOut().remove();
 		pop_log();
-		callback(data);
+		if(callback) callback(data);
 	}, 
 	function() {
 		log.fadeOut().remove();
@@ -183,6 +194,11 @@ function rm(file_id, filepath) {
 		file.id = null;
 	});
 	ls(dir);
+}
+
+function run(file_id, filepath) {
+	var log = create_log("run " + filepath);
+	call_logged(log,'run', {file: file_id});
 }
 
 function create_file(name) {

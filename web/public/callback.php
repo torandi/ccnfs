@@ -78,6 +78,18 @@ case "read":
 		error("Remote computer responded with error.");
 	}
 	break;
+case "run":
+	if(!$file || $file->type != "file") error("Node is not a file");
+
+	$res = execute_command($computer, "run $full_filename", false);
+	if($res == 1) {
+		output("OK");
+	} else if($res == 0) {
+		error("Command timed out");
+	} else {
+		error("Remote computer responded with error.");
+	}
+	break;
 case "write":
 	if(!$file || $file->type != "file") error("Node is not a file");
 
