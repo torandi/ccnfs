@@ -45,9 +45,8 @@ case "last_seen":
 	output("OK", $computer->formated_last_seen());
 	break;
 case "ls":
-
 	if($file && $file->type != "dir") error("Node is not a directory");
-	$res = execute_command($computer, "ls $file_text_id $full_filename", true);
+	$res = execute_command($computer, "ls $file_text_id $full_filename", (!$file || $file->has_children()));
 	if($res == 1) {
 		$data = array();
 		$data_str = "";

@@ -8,6 +8,14 @@ class Node extends BasicObject {
 		return ($this->parent == null ? null : Node::from_id($this->parent));
 	}
 
+	public function children() {
+		return Node::selection(array('computer_id' => $this->computer_id, 'parent' => $this->id));
+	}
+
+	public function has_children() {
+		return (Node::count(array('computer_id' => $this->computer_id, 'parent' => $this->id)) > 0);
+	}
+
 	public function full_path() {
 		if($this->parent) {
 			return $this->parent_node()->full_path() . "/" . $this->name;
