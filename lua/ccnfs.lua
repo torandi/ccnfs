@@ -191,6 +191,16 @@ function rm(req_id, filename)
 	end
 end
 
+function run(req_id, filename) 
+	if(not fs.exists(filename)) then
+		req_error(req_id, string.format("[read] No such file or directory %s", filename));
+		return;
+	else 
+		call_req("done", req_id);
+		shell.run(filename);
+	end
+end
+
 function write_line(line) 
 	current_write.fh.writeLine(line);
 
@@ -218,8 +228,8 @@ remote_functions = {
 		write(req_id, lines, filename);
 	end,
 	mkdir = mkdir,
-	rm = rm
-	
+	rm = rm,
+	run = run,
 }
 
 -- begin main code
