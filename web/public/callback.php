@@ -98,7 +98,7 @@ case "write":
 case "rm":
 	if(!$file) error("No such file or directory");
 
-	$res = execute_command($computer, "rm $file_text_id $full_filename", false);
+	$res = execute_command($computer, "rm $full_filename", false);
 	if($res == 1) {
 		$file->delete();
 		output("OK");
