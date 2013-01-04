@@ -38,6 +38,14 @@ function ccnfs(ckey) {
 			}
 		});
 
+		$("#mkdir").click(function() {
+			var name = prompt("Name: ");
+			if(name) {
+				create_dir(name);
+			}
+		});
+
+
 		$("#files option").live('click',function() {
 			var sel = $("#files option:selected");
 			var new_id = parseInt(sel.attr("value"));
@@ -171,5 +179,22 @@ function create_file(name) {
 			//Dir has not changed
 			$("#files").append("<option value='" + file.id + "' data-is_dir='0'>" + name + "</option>");
 		}
+	});
+}
+
+function create_dir(name) {
+	var new_dir = {
+		parent: dir,
+		id: null,
+		path: dir.path + name + "/"
+	}
+	var log = create_log("create directory " + new_dir.path);
+	call_logged(log,'mkdir', {file: dir.id, filename: name}, function(data) {
+		dir = new_dir;
+		dir.id = parseInt(data);
+
+		dir = new_dir;
+		$("#cur_dir").html(new_dir.path);
+		$("#files").children(":not(:first)").remove();
 	});
 }

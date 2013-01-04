@@ -111,7 +111,27 @@ case "mknod":
 	} else {
 		error("Remote computer responded with error.");
 	}
+	break;
+case "mkdir":
+	if($file && $file->type != "dir") error("Node is not a directory");
 
+	$filename = request("filename");
+	if(!substr($full_filename, -1) == "/") $full_filename .= "/";
+	$full_filename .= $filename;
+
+	if(Node::count_with_parent($file_id, array('computer_id' => $computer->id, 'name' => $filename)) > 0 ) error("File exists");
+
+	$res = execute_command($computer, "mkdir $full_filename");
+	if($res == 1) {
+		$new_node = new Node(array('computer_id'=> $computer->id, 'parent' => $file_id, 'name' => $filename, 'type' => 'dir'));
+		$new_node->commit();
+		output("OK",$new_node->id);
+	} else if($res == 0) {
+		error("Command timed out");
+	} else {
+		error("Remote computer responded with error.");
+	}
+	break;
 default:
 	error("Unknown command $cmd");
 }
