@@ -16,12 +16,16 @@ var file = {
 	changed: false
 }
 
+var ignore_cached = false;
+
 function ccnfs(ckey) {
 	key = ckey;
 	$(function() {
 
 		$("#dir_refresh").click(function() {
+			ignore_cached  = true;
 			ls(dir)
+			ignore_cached = false;
 		});
 
 		$("#save").click(write);
@@ -92,7 +96,7 @@ function call(cmd, data, callback, error_callback) {
 	data['cmd'] = cmd;
 	data['format'] = "true";
 	data['key'] = key;
-	if($("#cached").attr("checked")) {
+	if(!ignore_cached && $("#cached").attr("checked")) {
 		data['cached'] = "true";
 	}
 	$.post("callback.php", data, function(data) {
