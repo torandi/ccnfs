@@ -116,7 +116,7 @@ case "mkdir":
 	if($file && $file->type != "dir") error("Node is not a directory");
 
 	$filename = request("filename");
-	if(!substr($full_filename, -1) == "/") $full_filename .= "/";
+	if(substr($full_filename, -1) != "/") $full_filename .= "/";
 	$full_filename .= $filename;
 
 	if(Node::count_with_parent($file_id, array('computer_id' => $computer->id, 'name' => $filename)) > 0 ) error("File exists");
