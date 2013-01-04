@@ -177,6 +177,19 @@ function mkdir(req_id, filename)
 	end
 end
 
+function rm(req_id, filename) 
+	if(fs.isReadOnly(filename)) then
+		req_error(req_id, string.format("[rm] %s is read only\n", filename));
+		return;
+	elseif (not fs.exists(filename)) then
+		req_error(req_id, string.format("[rm] %s file doesn't exist\n", filename));
+		return;
+	else
+		fs.delete(filename);
+		call_req("done", req_id);
+	end
+end
+
 function write_line(line) 
 	current_write.fh.writeLine(line);
 
@@ -203,7 +216,9 @@ remote_functions = {
 		local lines, filename = file_data(data);
 		write(req_id, lines, filename);
 	end,
-	mkdir = mkdir
+	mkdir = mkdir,
+	rm = rm
+	
 }
 
 -- begin main code
