@@ -49,7 +49,8 @@ function ccnfs(ckey) {
 			var sel = $("#files option:selected");
 			var file_id = parseInt(sel.attr("value"));
 			var file_path = dir.path + sel.html();
-			if(!confirm("Delete "+ file_path + "?")) return;
+			var type = sel.data("is_dir") == 1 ? "directory" : "file";
+			if(!confirm("Delete "+ type + " " + file_path + "?")) return;
 			rm(file_id, file_path);
 		});
 
@@ -173,7 +174,7 @@ function write() {
 
 function rm(file_id, filepath) {
 	var log = create_log("rm " + filepath);
-	call_logged(log,'mknod', {file: file_id}, function(data) {
+	call_logged(log,'rm', {file: file_id}, function(data) {
 		$("#file").fadeOut();
 		file.id = null;
 	});

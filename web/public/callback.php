@@ -3,6 +3,8 @@
 
 write_log("[callback] ". var_export($_REQUEST, true));
 
+CommandQueue::cleanup();
+
 $key = request('key');
 $computer = Computer::from_key($key);
 
