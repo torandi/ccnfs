@@ -56,7 +56,7 @@ foreach($computer->nodes() as $node) {
 						</p>
 					</div>
 
-					<div id="file" style="float: left; margin-left: 10px; width: 500px;">
+					<div id="file" style="float: left; margin-left: 10px; width: 500px; display: none;">
 						<form id="file_form">
 							<p> 
 								<strong>File: </strong> <span id="cur_file">-</span>
