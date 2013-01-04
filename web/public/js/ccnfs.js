@@ -182,7 +182,7 @@ function read(new_file) {
 	call_logged(log,'read', {file: new_file.id}, function(data) {
 		file = new_file;
 		file.changed = false;
-		editor.setValue(data);
+		set_editor(data);
 		$("#cur_file").html(new_file.path);
 		$("#file").fadeIn();
 	});
@@ -220,7 +220,7 @@ function create_file(name) {
 		file = new_file;
 		file.changed = false;
 		file.id = parseInt(data);
-		editor.setValue("");
+		set_editor("");
 		$("#cur_file").html(new_file.path);
 		$("#file").fadeIn();
 
@@ -246,4 +246,10 @@ function create_dir(name) {
 		$("#cur_dir").html(new_dir.path);
 		$("#files").children(":not(:first)").remove();
 	});
+}
+
+function set_editor(new_value) {
+	editor.setValue(new_value);
+	editor.clearSelection();
+	file.changed = false;
 }
