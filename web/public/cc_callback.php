@@ -156,7 +156,7 @@ function update_command($command, $status) {
 	if($command && !$command->cached) {
 		$command->status = 1;
 		$command->commit();
-	} else if($command()) {
+	} else if($command) {
 		$command->delete();
 	}
 }
