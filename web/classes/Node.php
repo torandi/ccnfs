@@ -19,4 +19,21 @@ class Node extends BasicObject {
 	public function is_dir() {
 		return $this->type == "dir";
 	}
+
+	private static function prepare_parent_selection($parent, $selection = array()) {
+		if($parent == null) {
+			$selection['parent:null'] = null;
+		} else {
+			$selection['parent'] = $parent;
+		}
+		return $selection;
+	}
+
+	public static function selection_with_parent($parent, $selection = array()) {
+		return Node::selection(Node::prepare_parent_selection($parent, $selection));
+	} 
+
+	public static function count_with_parent($parent, $selection = array()) {
+		return Node::count(Node::prepare_parent_selection($parent, $selection));
+	} 
 }

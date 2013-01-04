@@ -7,4 +7,4 @@ CREATE TABLE IF NOT EXISTS `nodes` (
   PRIMARY KEY (`id`),
 	KEY `computer_id` (`computer_id`),
   KEY `parent` (`parent`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

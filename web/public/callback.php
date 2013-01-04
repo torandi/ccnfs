@@ -1,5 +1,5 @@
-<?php
-include "../includes.php";
+	<?php
+	include "../includes.php";
 
 write_log("[callback] ". var_export($_REQUEST, true));
 
@@ -92,6 +92,26 @@ case "write":
 		error("Remote computer responded with error.");
 	}
 	break;
+case "mknod":
+	if($file && $file->type != "dir") error("Node is not a directory");
+
+	$filename = request("filename");
+	if(!substr($full_filename, -1) == "/") $full_filename .= "/";
+	$full_filename .= $filename;
+
+	if(Node::count_with_parent($file_id, array('computer_id' => $computer->id, 'name' => $filename)) > 0 ) error("File exists");
+
+	$res = execute_command($computer, "write 1 $full_filename\n\n");
+	if($res == 1) {
+		$new_file = new Node(array('computer_id'=> $computer->id, 'parent' => $file_id, 'name' => $filename, 'type' => 'file', 'data' => "\n"));
+		$new_file->commit();
+		output("OK",$new_file->id);
+	} else if($res == 0) {
+		error("Command timed out");
+	} else {
+		error("Remote computer responded with error.");
+	}
+
 default:
 	error("Unknown command $cmd");
 }

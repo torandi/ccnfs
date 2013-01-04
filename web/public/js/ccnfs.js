@@ -26,6 +26,18 @@ function ccnfs(ckey) {
 
 		$("#save").click(write);
 
+		$("#content").keypress(function() {
+			file.changed = true;
+		});
+
+		$("#mkfile").click(function() {
+			if(file.changed && !confirm("The open file has changed, discard changes?")) return;
+			var name = prompt("Name: ");
+			if(name) {
+				create_file(name);
+			}
+		});
+
 		$("#files option").live('click',function() {
 			var sel = $("#files option:selected");
 			var new_id = parseInt(sel.attr("value"));
@@ -122,7 +134,7 @@ function ls(new_dir) {
 }
 
 function read(new_file) {
-	if(file.changed && !confirm("The file has changed, discard changes?")) return;
+	if(file.changed && !confirm("The open file has changed, discard changes?")) return;
 	var log = create_log("read " + new_file.path);
 	call_logged(log,'read', {file: new_file.id}, function(data) {
 		file = new_file;
@@ -137,5 +149,27 @@ function write() {
 	var log = create_log("write " + file.path);
 	call_logged(log,'write', {file: file.id, data: $("#content").val()}, function(data) {
 		file.changed = false;
+	});
+}
+
+function create_file(name) {
+	var new_file = {
+		id: null,
+		dir: dir,
+		path: dir.path + name
+	};
+	var log = create_log("create file " + new_file.path);
+	call_logged(log,'mknod', {file: dir.id, filename: name}, function(data) {
+		file = new_file;
+		file.changed = false;
+		file.id = parseInt(data);
+		$("#content").val("");
+		$("#cur_file").html(new_file.path);
+		$("#file").fadeIn();
+
+		if(new_file.dir.id == dir.id) {
+			//Dir has not changed
+			$("#files").append("<option value='" + file.id + "' data-is_dir='0'>" + name + "</option>");
+		}
 	});
 }

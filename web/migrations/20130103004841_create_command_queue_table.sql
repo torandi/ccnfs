@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `command_queue` (
   `command` text NOT NULL,
   PRIMARY KEY (`id`),
   KEY `computer_id` (`computer_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 ALTER TABLE `command_queue`
   ADD CONSTRAINT `command_queue_ibfk_1` FOREIGN KEY (`computer_id`) REFERENCES `computers` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
