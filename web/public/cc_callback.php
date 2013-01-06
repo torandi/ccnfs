@@ -59,7 +59,7 @@ case "hi":
 	}
 	break;
 case "poll":
-	$queue = CommandQueue::selection(array('computer_id' => $computer->id, 'status'=>0));
+	$queue = CommandQueue::selection(array('computer_id' => $computer->id, 'status'=>0, '@order'=>'id'));
 	echo "OK\n";
 	foreach($queue as $command) {
 		echo "{$command->id} {$command->command}\n";
