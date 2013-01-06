@@ -64,6 +64,7 @@ function update()
 		fh.write(res.readAll());
 		fh.close();
 		print("Program updated, rebooting system");
+		sleep(3);
 		os.reboot();
 	end
 end
@@ -263,7 +264,7 @@ remote_functions = {
 
 -- begin main code
 
-print(string.format("ComputerCraft Network FileSystem %s\n  Author: Torandi\n", version));
+print(string.format("ComputerCraft Network FileSystem %s\n  Author: Torandi\n", version_long));
 
 load_config();
 
