@@ -66,14 +66,7 @@ function ccnfs(ckey) {
 		});
 
 		$("#run").click(function() {
-			var sel = $("#files option:selected");
-			var file_id = parseInt(sel.attr("value"));
-			var file_path = dir.path + sel.html();
-			if(sel.data("is_dir")) {
-				alert("You can't run a directory :D");
-				return;
-			}
-			run(file_id, file_path);
+			run(file.id, file.path);
 		});
 
 		$("#files option").live('click',function() {
