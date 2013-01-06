@@ -11,7 +11,10 @@ cur_delay = min_delay
 -- end config
 
 url = string.format("%s/cc_callback.php", server);
-version = "0.11 BETA"
+version = 1
+version_long = "0.2 BETA"
+
+version_url_string = "version_id=" .. version_id
 
 -- begin help functions
 
@@ -49,6 +52,22 @@ function split(p, d)
   return t
 end
 
+function update()
+	res = http.get(server .. "/lua/ccnfs.lua");
+	if(not res) then
+		error("Update: Failed to read ccnfs.lua from server");
+	end
+	fh = fs.open(shell.getRunningProgram(), "w");
+	if(not fh) then
+		error("Update: Can't open " .. shell.getRunningProgram() .. " for writing");
+	else
+		fh.write(res.readAll());
+		fh.close();
+		print("Program updated, rebooting system");
+		os.reboot();
+	end
+end
+
 -- Call to server, does not append computer key
 -- @see call
 function call_raw(data)
@@ -63,6 +82,12 @@ function call_raw(data)
 			return data;
 		elseif(op == "ERR") then
 			print(string.format("Server responded with error: %s", data));
+			return nil;
+		elseif(op == "UPDATE") then
+			print("Local program out of date, updating!");
+			update();
+		else
+			print(string.format("Unknown response operation from server: %s", op));
 			return nil;
 		end
 	end
@@ -245,18 +270,19 @@ load_config();
 -- initialize connection
 
 if(not key) then
-	local res = call_raw("cmd=hi&new=true");
+	local res = call_raw("cmd=hi&new=true&" .. version_url_string);
 	if(res) then
 		key = res;
 		local fh = fs.open(config_file, "w");
 		fh.writeLine(key);
 		fh.close();
+		ls(0, 0, "/");
 	else
 		-- error message should already been printed
 		return;
 	end
 else
-	if(call("hi")) then
+	if(call("hi", version_url_string)) then
 		ls(0, 0, "/");
 	else
 		return;

@@ -17,6 +17,10 @@
 			<input type="text" name="id"/>
 			<br/>
 
+			<label>version_id: </label>
+			<input type="text" name="version_id"/>
+			<br/>
+
 			<label>Parent: </label>
 			<input type="text" name="parent"/>
 			<br/>
