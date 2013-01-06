@@ -39,7 +39,7 @@ case "hi":
 	if($version != $CCNFS_VERSION) {
 		//must update!
 		if($version == 0) { //Version 0 did not have support for update
-			error("You are running a old version of ccnfs! Download the auto updating version at pastebin 53bbKMu5");
+			error("You are running a old version of ccnfs! Download the auto updating version at pastebin A9ApVUca");
 		} else {
 			output("UPDATE");
 		}

@@ -131,6 +131,11 @@ function file_data(str)
 	return file_id, filename;
 end
 
+function space_split(str) 
+	local part1, part2 = str:match("(.+) (.+)");
+	return part1, part2;
+end
+
 function is_blank(x)
   return not not tostring(x):find("^%s*$")
 end
@@ -213,10 +218,48 @@ function rm(req_id, filename)
 		req_error(req_id, string.format("[rm] %s is read only\n", filename));
 		return;
 	elseif (not fs.exists(filename)) then
-		req_error(req_id, string.format("[rm] %s file doesn't exist\n", filename));
+		req_error(req_id, string.format("[rm] %s doesn't exist\n", filename));
 		return;
 	else
 		fs.delete(filename);
+		call_req("done", req_id);
+	end
+end
+
+function mv(req_id, old_filename, new_filename) 
+	if(fs.isReadOnly(old_filename)) then
+		req_error(req_id, string.format("[mv] %s is read only\n", old_filename));
+		return;
+	elseif (not fs.exists(old_filename)) then
+		req_error(req_id, string.format("[mv] %s doesn't exist\n", old_filename));
+		return;
+	elseif(fs.isReadOnly(new_filename)) then
+		req_error(req_id, string.format("[mv] %s is read only\n", new_filename));
+		return;
+	elseif (fs.exists(new_filename)) then
+		req_error(req_id, string.format("[mv] Target %s exist\n", new_filename));
+		return;
+	else
+		fs.move(old_filename, new_filename);
+		call_req("done", req_id);
+	end
+end
+
+function cp(req_id, old_filename, new_filename) 
+	if(fs.isReadOnly(old_filename)) then
+		req_error(req_id, string.format("[cp] %s is read only\n", old_filename));
+		return;
+	elseif (not fs.exists(old_filename)) then
+		req_error(req_id, string.format("[cp] %s doesn't exist\n", old_filename));
+		return;
+	elseif(fs.isReadOnly(new_filename)) then
+		req_error(req_id, string.format("[cp] %s is read only\n", new_filename));
+		return;
+	elseif (fs.exists(new_filename)) then
+		req_error(req_id, string.format("[cp] Target %s exist\n", new_filename));
+		return;
+	else
+		fs.copy(old_filename, new_filename);
 		call_req("done", req_id);
 	end
 end
@@ -260,6 +303,16 @@ remote_functions = {
 	mkdir = mkdir,
 	rm = rm,
 	run = run,
+	mv = function(req_id, data)
+		local old_filename, new_filename = space_split(data);
+		mv(req_id, old_filename, new_filename);
+	end,
+	cp = function(req_id, data)
+		local old_filename, new_filename = space_split(data);
+		cp(req_id, old_filename, new_filename);
+	end
+
+
 }
 
 -- begin main code

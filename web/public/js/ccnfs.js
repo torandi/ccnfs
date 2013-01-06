@@ -314,21 +314,21 @@ function create_file(name) {
 function move(oldfile, newfile) {
 	if(newfile[0] != "/") newfile = dir.path + newfile;
 	var log = create_log("move " + oldfile.path + " to " + newfile);
-	call_logged(log,'mv', {file: oldfile.id, target: newfile});
-
-	ignore_cached  = true;
-	ls(dir)
-	ignore_cached = false;
+	call_logged(log,'mv', {file: oldfile.id, target: newfile}, function(data) {
+		ignore_cached  = true;
+		ls(dir)
+		ignore_cached = false;
+	});
 }
 
 function copy(oldfile, newfile) {
 	if(newfile[0] != "/") newfile = dir.path + newfile;
 	var log = create_log("copy " + oldfile.path + " to " + newfile);
-	call_logged(log,'cp', {file: oldfile.id, target: newfile});
-
-	ignore_cached  = true;
-	ls(dir)
-	ignore_cached = false;
+	call_logged(log,'cp', {file: oldfile.id, target: newfile}, function(data) {
+		ignore_cached  = true;
+		ls(dir)
+		ignore_cached = false;
+	});
 }
 
 function create_dir(name) {

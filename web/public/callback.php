@@ -159,9 +159,13 @@ case "cp":
 case "mknod":
 	if($file && $file->type != "dir") error("Node is not a directory", false);
 
-	$filename = request("filename");
+	$filename = trim(request("filename"));
 	if(substr($full_filename, -1) != "/") $full_filename .= "/";
 	$full_filename .= $filename;
+
+	if(strpos($full_filename, " ") !== false) {
+		error("Filename can not contain space");
+	}
 
 	if(Node::count_with_parent($file_id, array('computer_id' => $computer->id, 'name' => $filename)) > 0 ) error("File exists");
 
@@ -206,8 +210,13 @@ function parse_target_action($action) {
 	if($full_filename == "/") error("Can't $action root directory");
 	if(!$file) error("No such file or directory");
 
-	$target = request("target");
+	$target = trim(request("target"));
 	$target_name = $file->name;
+
+	if(strpos($target, " ") !== false || strpos($target_name, " ") !== false) {
+		error("Filename can not contain space");
+	}
+
 	if(substr($target, -1) != "/") {
 		$target_name = substr($target, strrpos($target, "/") + 1);
 		$target = substr($target, 0, strrpos($target, "/"));
