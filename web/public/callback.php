@@ -146,9 +146,6 @@ case "cp":
 
 	$res = execute_command($computer, "cp $full_filename $target/$target_name", false);
 	if($res == 1) {
-		$file->parent = $parent_id;
-		$file->name = $target_name;
-		$file->commit();
 		output("OK");
 	} else if($res == 0) {
 		error("Command timed out");
