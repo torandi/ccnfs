@@ -66,6 +66,18 @@ function ccnfs(ckey) {
 			var newpath = prompt("Move " + sel.path + " to: ");
 			if(newpath) {
 				move(sel, newpath);
+			}
+		});
+
+		$("#copy").click(function() {
+			var sel = get_selected();
+			if(!sel) {
+				alert("Nothing selected");
+				return;
+			}
+			var newpath = prompt("Copy " + sel.path + " to: ");
+			if(newpath) {
+				copy(sel, newpath);
 				ignore_cached  = true;
 				ls(dir)
 				ignore_cached = false;
@@ -303,7 +315,20 @@ function move(oldfile, newfile) {
 	if(newfile[0] != "/") newfile = dir.path + newfile;
 	var log = create_log("move " + oldfile.path + " to " + newfile);
 	call_logged(log,'mv', {file: oldfile.id, target: newfile});
-	ls(dir);
+
+	ignore_cached  = true;
+	ls(dir)
+	ignore_cached = false;
+}
+
+function copy(oldfile, newfile) {
+	if(newfile[0] != "/") newfile = dir.path + newfile;
+	var log = create_log("copy " + oldfile.path + " to " + newfile);
+	call_logged(log,'cp', {file: oldfile.id, target: newfile});
+
+	ignore_cached  = true;
+	ls(dir)
+	ignore_cached = false;
 }
 
 function create_dir(name) {
