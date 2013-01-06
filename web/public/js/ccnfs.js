@@ -1,6 +1,7 @@
 var key;
 var active_logs = 0;
 var editor;
+var error_timeout = 0;
 
 var dir = {
 	parent: {
@@ -56,13 +57,42 @@ function ccnfs(ckey) {
 			}
 		});
 
+		$("#move").click(function() {
+			var sel = get_selected();
+			if(!sel) {
+				alert("Nothing selected");
+				return;
+			}
+			var newpath = prompt("Move " + sel.path + " to: ");
+			if(newpath) {
+				move(sel, newpath);
+				ignore_cached  = true;
+				ls(dir)
+				ignore_cached = false;
+			}
+		});
+
 		$("#rm").click(function() {
-			var sel = $("#files option:selected");
-			var file_id = parseInt(sel.attr("value"));
-			var file_path = dir.path + sel.html();
-			var type = sel.data("is_dir") == 1 ? "directory" : "file";
-			if(!confirm("Delete "+ type + " " + file_path + "?")) return;
-			rm(file_id, file_path);
+			var sel = get_selected();
+			if(!sel) {
+				alert("Nothing selected");
+				return;
+			}
+			if(!confirm("Delete "+ sel.type + " " + sel.path + "?")) return;
+			rm(sel.id, sel.path);
+		});
+
+		$("#run_selected").click(function() {
+			var sel = get_selected();
+			if(!sel) {
+				alert("Nothing selected");
+				return;
+			}
+			if(sel.is_dir) {
+				alert("You can't run a directory :D");
+				return;
+			}
+			run(sel.id, sel.path);
 		});
 
 		$("#run").click(function() {
@@ -70,29 +100,31 @@ function ccnfs(ckey) {
 			run(file.id, file.path);
 		});
 
-		$("#files option").live('click',function() {
-			var sel = $("#files option:selected");
-			var new_id = parseInt(sel.attr("value"));
-			var is_dir = sel.data("is_dir");
-			if(is_dir) {
+		$("#files option").live('dblclick',function() {
+			var sel = get_selected();
+			if(!sel) {
+				alert("Nothing selected? Wat?");
+				return;
+			}
+			if(sel.is_dir) {
 				var new_dir;
-				if(new_id == 0 && dir.id != 0) {
+				if(sel.id == 0 && dir.id != 0) {
 					new_dir = dir.parent;
-				} else if(new_id == 0) {
+				} else if(sel.id == 0) {
 					new_dir = dir;
 				} else {
 					var new_dir = {
 						parent: dir,
-						id: new_id,
-						path: dir.path + sel.html()
+						id: sel.id,
+						path: sel.path
 					};
 				}
 				ls(new_dir);
 			} else {
 				var new_file = {
-					id: new_id,
+					id: sel.id,
 					dir: dir,
-					path: dir.path + sel.html(),
+					path: sel.path,
 					changed: false
 				};
 				read(new_file);
@@ -111,11 +143,38 @@ function ccnfs(ckey) {
 					event.preventDefault();
 					return false;
 				}
+
+				if (( String.fromCharCode(event.which).toLowerCase() == 'r' && event.ctrlKey)) {
+					if(file.id != null) {
+						write()
+						run(file.id, file.path);
+					}
+
+					event.preventDefault();
+					return false;
+				}
 		});
 
 
 		refresh_last_seen();
 	});
+}
+
+/*
+ * Returns { id, name, path, type, is_dir } or null if nothing is selected
+ */
+function get_selected() {
+	var sel = $("#files option:selected");
+
+	if(sel.size() == 0) return null;
+
+	return {
+		id: parseInt(sel.attr("value")),
+		is_dir: sel.data("is_dir"),
+		type: sel.data("is_dir") == 1 ? "directory" : "file",
+		name: sel.html(),
+		path: dir.path + sel.html()
+	}
 }
 
 function call(cmd, data, callback, error_callback) {
@@ -127,12 +186,13 @@ function call(cmd, data, callback, error_callback) {
 	}
 	$.post("callback.php", data, function(data) {
 		if(data.status == "OK") {
-			$("#error").fadeOut();
+			if(error_timeout < time()) $("#error").fadeOut();
 			
 			if(callback) callback(data.data);
 		} else {
 			$("#error").html(cmd + ": " +data.data);
 			$("#error").fadeIn();
+			error_timeout = time() + 7000;
 			if(error_callback) error_callback();
 		}
 	});
@@ -239,6 +299,13 @@ function create_file(name) {
 	});
 }
 
+function move(oldfile, newfile) {
+	if(newfile[0] != "/") newfile = dir.path + newfile;
+	var log = create_log("move " + oldfile.path + " to " + newfile);
+	call_logged(log,'mv', {file: oldfile.id, target: newfile});
+	ls(dir);
+}
+
 function create_dir(name) {
 	var new_dir = {
 		parent: dir,
@@ -261,4 +328,8 @@ function set_editor(new_value) {
 	editor.clearSelection();
 	editor.scrollToRow(0);
 	file.changed = false;
+}
+
+function time() {
+	return new Date().getTime();
 }

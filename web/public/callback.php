@@ -124,6 +124,22 @@ case "rm":
 		error("Remote computer responded with error.");
 	}
 	break;
+case "mv":
+
+	parse_target_action("move");
+
+	$res = execute_command($computer, "move $full_filename $target/$target_name", false);
+	if($res == 1) {
+		$file->parent = $parent_id;
+		$file->name = $target_name;
+		$file->commit();
+		output("OK");
+	} else if($res == 0) {
+		error("Command timed out");
+	} else {
+		error("Remote computer responded with error.");
+	}
+	break;
 case "mknod":
 	if($file && $file->type != "dir") error("Node is not a directory", false);
 
@@ -166,4 +182,39 @@ case "mkdir":
 	break;
 default:
 	error("Unknown command $cmd");
+}
+
+function parse_target_action($action) {
+	global $full_filename, $file, $target, $target_name, $parent_id, $computer;
+
+	if($full_filename == "/") error("Can't $action root directory");
+	if(!$file) error("No such file or directory");
+
+	$target = request("target");
+	$target_name = $file->name;
+	if(substr($target, -1) != "/") {
+		$target_name = substr($target, strrpos($target, "/") + 1);
+		$target = substr($target, 0, strrpos($target, "/"));
+	} else {
+		$target = substr($target, 0, strlen($target) - 1);
+	}
+
+	if($target != "") { //target dir is root
+		$error_msg = "";
+		$parent_node = $computer->find_node($target, $error_msg);
+		if(!$parent_node) error($error_msg);
+		if(!$parent_node->is_dir()) error("$target is not a directory");
+		$parent_id = $parent_node->id;
+	} else {
+		$parent_id = null;
+	}
+
+	$thisnode = Node::one_with_parent($parent_id, array('computer_id' => $computer->id, 'name' => $target_name));
+
+	if($thisnode && $thisnode->is_dir()) {
+		$target .= "/$target_name";
+		$target_name = $file->name;
+	} else if($thisnode) {
+		error("Target exists");
+	}
 }

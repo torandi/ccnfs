@@ -58,4 +58,13 @@ class Computer extends BasicObject {
 		}
 		return Node::selection($selection);
 	}
+
+	/**
+	 * Finds a node from a given path.
+	 * Paths must be absolute
+	 * @param $error_msg filled with error msg if the function returns null
+	 */
+	public function find_node($path, &$error_msg) {
+		return Node::from_path($this, $path, $error_msg);
+	}
 }

@@ -37,7 +37,7 @@ $computer = Computer::from_key($key);
 								<input type='button' value='Refresh' style='float: right' id='dir_refresh'/>
 							</p>
 							<p>
-							<select id="files" size="30">
+							<select id="files" size="25">
 								<option value='0' data-is_dir='1'/>..</option>
 <?
 foreach($computer->nodes() as $node) {
@@ -52,7 +52,8 @@ foreach($computer->nodes() as $node) {
 								<input type="button" value="Delete" id="rm" style="float: right;"/> <br/>
 								<input type="button" value="New directory" id="mkdir"/>
 								<input type="button" value="Move" id="move" style="float: right;"/> <br/>
-								<input type="button" value="Copy" id="copy" style="float: right;"/>
+								<input type="button" value="Run selected" id="run_selected"/>
+								<input type="button" value="Copy" id="copy" style="float: right;"/> <br/>
 							</p>
 						</form>
 						</p>
