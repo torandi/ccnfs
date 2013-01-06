@@ -37,7 +37,7 @@ $computer = Computer::from_key($key);
 								<input type='button' value='Refresh' style='float: right' id='dir_refresh'/>
 							</p>
 							<p>
-							<select id="files" size="25">
+							<select id="files" size="30">
 								<option value='0' data-is_dir='1'/>..</option>
 <?
 foreach($computer->nodes() as $node) {
@@ -59,7 +59,7 @@ foreach($computer->nodes() as $node) {
 						</p>
 					</div>
 
-					<div id="file" style="float: left; margin-left: 10px; width: 600px; display: none;">
+					<div id="file" style="float: left; margin-left: 10px; width: 600px; height: 600px; display: none;">
 						<form id="file_form">
 							<p> 
 								<strong>File: </strong> <span id="cur_file">-</span>
