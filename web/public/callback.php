@@ -116,7 +116,7 @@ case "rm":
 			$file->delete();
 			output("OK");
 		} else {
-			error("File is already deleted");
+			output("OK");
 		}
 	} else if($res == 0) {
 		error("Command timed out");
