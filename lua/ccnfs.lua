@@ -1,7 +1,7 @@
 -- Config:
 
 server = "http://ccnfs.torandi.com";
-config_file = "ccnfs.config";
+config_file = "ccnfs.conf";
 
 max_delay = 10
 min_delay = 2
@@ -11,11 +11,15 @@ cur_delay = min_delay
 -- end config
 
 url = string.format("%s/cc_callback.php", server);
-version = "0.1 BETA"
+version = "0.11 BETA"
 
 -- begin help functions
 
-function load_config() 
+function load_config()
+	local disk_file = "/disk/" .. config_file;
+	if(fs.exists(disk_file)) then
+		config_file = disk_file;
+	end
 	local file = fs.open(config_file, "r");
 	if(file) then
 		key = file.readLine();
