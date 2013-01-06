@@ -37,7 +37,7 @@ $computer = Computer::from_key($key);
 								<input type='button' value='Refresh' style='float: right' id='dir_refresh'/>
 							</p>
 							<p>
-							<select id="files" size="20">
+							<select id="files" size="30">
 								<option value='0' data-is_dir='1'/>..</option>
 <?
 foreach($computer->nodes() as $node) {
@@ -51,19 +51,21 @@ foreach($computer->nodes() as $node) {
 								<input type="button" value="New file" id="mkfile"/>
 								<input type="button" value="Delete" id="rm" style="float: right;"/> <br/>
 								<input type="button" value="New directory" id="mkdir"/>
+								<input type="button" value="Move" id="move" style="float: right;"/> <br/>
+								<input type="button" value="Copy" id="copy" style="float: right;"/>
 							</p>
 						</form>
 						</p>
 					</div>
 
-					<div id="file" style="float: left; margin-left: 10px; width: 500px; display: none;">
+					<div id="file" style="float: left; margin-left: 10px; width: 600px; display: none;">
 						<form id="file_form">
 							<p> 
 								<strong>File: </strong> <span id="cur_file">-</span>
 								<input type="button" value="Save" id="save" style="float: right;"/>
-								<input type="button" value="Run file" id="run" style="float: right;"/>
+								<input type="button" value="Run & Save" id="run" style="float: right;"/>
 							</p>
-							<div id="content" style="width: 500px; height: 400px"></div>
+							<div id="content" style="width: 600px; height: 600px"></div>
 						</form>
 						</p>
 					</div>

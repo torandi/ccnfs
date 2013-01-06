@@ -11,7 +11,7 @@ var dir = {
 	path: "/"
 }
 var file = {
-	id: 0,
+	id: null,
 	dir: null,
 	path: null,
 	changed: false
@@ -66,6 +66,7 @@ function ccnfs(ckey) {
 		});
 
 		$("#run").click(function() {
+			write();
 			run(file.id, file.path);
 		});
 
@@ -96,6 +97,20 @@ function ccnfs(ckey) {
 				};
 				read(new_file);
 			}
+		});
+
+		$(document).keydown(function(event) {
+
+				//19 for Mac Command+S
+				if (( String.fromCharCode(event.which).toLowerCase() == 's' && event.ctrlKey) || (event.which == 19)) {
+
+					if(file.id != null) {
+						write();
+					}
+
+					event.preventDefault();
+					return false;
+				}
 		});
 
 
