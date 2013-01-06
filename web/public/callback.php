@@ -239,7 +239,10 @@ function parse_target_action($action) {
 	if($thisnode && $thisnode->is_dir()) {
 		$target .= "/$target_name";
 		$target_name = $file->name;
-	} else if($thisnode) {
+		$thisnode = Node::one_with_parent($thisnode->id, array('computer_id' => $computer->id, 'name' => $target_name));
+	}
+
+	if($thisnode) {
 		error("Target exists");
 	}
 }
