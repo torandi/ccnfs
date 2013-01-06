@@ -14,7 +14,7 @@ url = string.format("%s/cc_callback.php", server);
 version = 1
 version_long = "0.2 BETA"
 
-version_url_string = "version_id=" .. version_id
+version_url_string = "version=" .. version
 
 -- begin help functions
 

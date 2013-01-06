@@ -1,8 +1,8 @@
 <?php
 include "../includes.php";
 
-$CCNFS_VERSION_ID = 1;
-$CCNFS_VERSION_LONG_NAME = "0.2 BETA";
+$CCNFS_VERSION = 1;
+$CCNFS_VERSION_NAME = "0.2 BETA";
 
 /*
  * Callback file used by computer in minecraft
@@ -30,15 +30,15 @@ if(!$computer && !($cmd == "hi" && request("new"))) {
 switch($cmd) {
 case "hi":
 
-	$version_id = request("version_id");
+	$version = request("version");
 
-	if(!$version_id) {
-		$version_id = 0;
+	if(!$version) {
+		$version = 0;
 	}
 
-	if($version_id != $CCNFS_VERSION_ID) {
+	if($version != $CCNFS_VERSION) {
 		//must update!
-		if($version_id == 0) { //Version 0 did not have support for update
+		if($version == 0) { //Version 0 did not have support for update
 			error("You are running a old version of ccnfs! Download the auto updating version at pastebin NOT_YET_PASTED");
 		} else {
 			output("UPDATE");
