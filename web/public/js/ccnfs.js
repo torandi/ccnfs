@@ -280,8 +280,10 @@ function rm(file_id, filepath) {
 	call_logged(log,'rm', {file: file_id}, function(data) {
 		$("#file").fadeOut();
 		file.id = null;
+		ignore_cached = true;
+		ls(dir);
+		ignore_cached = false;
 	});
-	ls(dir);
 }
 
 function run(file_id, filepath) {
