@@ -86,6 +86,10 @@ foreach($computer->nodes() as $node) {
 					<input type="submit" value="Open"/>
 				</form>
 			</div>
+			<div>
+				<h2>Install in minecraft</h2>
+				<i>pastebin get 5sGt41w8 ccnfs</i>
+			</div>
 			<? } ?>
 		</div>
 		</div>
